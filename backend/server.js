@@ -90,7 +90,7 @@ app.get("/api/health/email-test", async (req, res) => {
         success: true,
         message: "Resend API key is configured. Email will be sent via Resend HTTP API.",
         provider: "resend",
-        resend_from: process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || "not set",
+        resend_from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
       });
     } else {
       // Test SMTP connection

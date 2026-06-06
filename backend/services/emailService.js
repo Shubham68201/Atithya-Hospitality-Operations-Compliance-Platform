@@ -38,8 +38,10 @@ const send = async (to, subject, html) => {
   // ── Strategy 1: Resend HTTP API (works on all cloud hosts) ──
   if (useResend()) {
     try {
-      // Resend requires a verified domain or use "onboarding@resend.dev" for testing
-      const from = `${fromName} <${process.env.RESEND_FROM_EMAIL || fromEmail}>`;
+      // Resend requires a verified domain or use "onboarding@resend.dev" for testing.
+      // We cannot fallback to fromEmail if it's a @gmail.com address, so we default to onboarding@resend.dev.
+      const resendFrom = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+      const from = `${fromName} <${resendFrom}>`;
       return await sendViaResend({ from, to, subject, html, text });
     } catch (err) {
       console.error(`❌ Resend FAILED → ${to} | ${subject}`);
