@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Poppins", sans-serif;
+    background-color: #FAF7F2;
+    color: #2E2E2E;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: "Cinzel", Georgia, serif;
+  }
+}
+
+@layer components {
+  .btn-gold {
+    @apply bg-gold text-navy font-semibold px-6 py-3 rounded-lg hover:bg-deep-gold transition-colors duration-200 font-poppins;
+  }
+  .btn-navy {
+    @apply bg-navy text-ivory font-semibold px-6 py-3 rounded-lg hover:bg-navy-light transition-colors duration-200;
+  }
+  .btn-outline-gold {
+    @apply border-2 border-gold text-gold font-semibold px-6 py-3 rounded-lg hover:bg-gold hover:text-navy transition-colors duration-200;
+  }
+  .card-elegant {
+    @apply bg-white rounded-2xl shadow-md border border-gray-100 p-6;
+  }
+  .section-heading {
+    @apply font-cinzel text-3xl md:text-4xl text-navy font-semibold;
+  }
+  .gold-divider {
+    @apply w-16 h-1 bg-gold rounded-full;
+  }
+  .input-field {
+    @apply w-full border border-gray-200 rounded-lg px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-gold focus:border-transparent bg-white transition-all duration-200 font-poppins;
+  }
+  .label-field {
+    @apply block text-sm font-medium text-charcoal mb-1.5 font-poppins;
+  }
+  .error-text {
+    @apply text-red-500 text-xs mt-1;
+  }
+  .badge-status {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #C8A25D; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #A67C32; }
+
+/* Animation delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
