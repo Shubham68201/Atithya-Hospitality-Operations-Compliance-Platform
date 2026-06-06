@@ -13,25 +13,40 @@ export const createTransporter = () => {
     );
   }
 
-  const config = {
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpSecure,
-    auth: {
-      user: smtpUser,
-      pass: smtpPass,
-    },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 20000,
-    tls: {
-      rejectUnauthorized: false,
-    },
-  };
+  const isGmail = smtpHost.includes("gmail.com") && !process.env.SMTP_SERVICE;
 
-  if (smtpHost.includes("gmail.com") && !process.env.SMTP_SERVICE) {
-    config.service = "gmail";
-  }
+  // When using Gmail service, do NOT set host/port — they conflict.
+  // nodemailer's "gmail" service already knows the correct host/port/security.
+  const config = isGmail
+    ? {
+        service: "gmail",
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      }
+    : {
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpSecure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      };
+
+  // Common options for both
+  config.connectionTimeout = 30000; // 30s — Render free tier can be slow
+  config.greetingTimeout = 30000;
+  config.socketTimeout = 30000;
+  config.tls = { rejectUnauthorized: false };
+
+  // Debug logging in production to diagnose email issues
+  config.logger = process.env.NODE_ENV !== "production" ? true : false;
+  config.debug = process.env.NODE_ENV !== "production";
+
+  console.log(`📧 SMTP transporter: ${isGmail ? "Gmail service" : `${smtpHost}:${smtpPort}`} | user: ${smtpUser}`);
 
   return nodemailer.createTransport(config);
 };
+

@@ -31,19 +31,27 @@ const send = async (to, subject, html) => {
   if (!SMTP_USER || !SMTP_PASS) {
     throw new Error("SMTP_USER and SMTP_PASS are required.");
   }
-  const transporter = createTransporter();
-  // ← verify() call removed; it was failing on cold SMTP connections
-  await transporter.sendMail({
-    from: `"${process.env.FROM_NAME || "Atithya Platform"}" <${COMPANY_EMAIL}>`,
-    to,
-    subject,
-    text: html
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim(),
-    html,
-  });
-  console.log(`✉  Email sent → ${to} | ${subject}`);
+  try {
+    const transporter = createTransporter();
+    const info = await transporter.sendMail({
+      from: `"${process.env.FROM_NAME || "Atithya Platform"}" <${COMPANY_EMAIL}>`,
+      to,
+      subject,
+      text: html
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim(),
+      html,
+    });
+    console.log(`✉  Email sent → ${to} | ${subject} | messageId: ${info.messageId}`);
+    return info;
+  } catch (err) {
+    console.error(`❌ Email FAILED → ${to} | ${subject}`);
+    console.error(`   Error: ${err.message}`);
+    console.error(`   Code: ${err.code} | Command: ${err.command}`);
+    if (err.response) console.error(`   SMTP Response: ${err.response}`);
+    throw err;
+  }
 };
 
 // ── OTP ──────────────────────────────────────────────────────────────

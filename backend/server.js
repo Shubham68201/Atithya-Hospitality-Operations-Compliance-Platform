@@ -72,10 +72,31 @@ app.get("/api/health", (req, res) =>
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     smtp_user: process.env.SMTP_USER ? "configured" : "MISSING",
+    smtp_pass: process.env.SMTP_PASS ? "configured" : "MISSING",
+    smtp_host: process.env.SMTP_HOST || "not set (default: smtp.gmail.com)",
     cloudinary: process.env.CLOUDINARY_CLOUD_NAME ? "configured" : "MISSING",
     mongo: process.env.MONGO_URI ? "configured" : "MISSING",
   }),
 );
+
+// ── SMTP diagnostic (verify connection only, no email sent) ──────────
+app.get("/api/health/email-test", async (req, res) => {
+  try {
+    const { createTransporter } = await import("./config/nodemailer.js");
+    const transporter = createTransporter();
+    await transporter.verify();
+    res.json({ success: true, message: "SMTP connection verified successfully." });
+  } catch (err) {
+    console.error("SMTP verify failed:", err);
+    res.status(500).json({
+      success: false,
+      message: "SMTP connection failed.",
+      error: err.message,
+      code: err.code,
+      command: err.command,
+    });
+  }
+});
 
 // ── Routes ────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
