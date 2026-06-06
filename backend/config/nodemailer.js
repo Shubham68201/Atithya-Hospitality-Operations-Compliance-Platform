@@ -42,7 +42,9 @@ export const sendViaResend = async ({ from, to, subject, html, text }) => {
     throw err;
   }
 
-  console.log(`✉  Email sent via Resend → ${to} | ${subject} | id: ${data?.id}`);
+  console.log(
+    `✉  Email sent via Resend → ${to} | ${subject} | id: ${data?.id}`,
+  );
   return data;
 };
 
@@ -64,22 +66,39 @@ export const createTransporter = () => {
 
   const isGmail = smtpHost.includes("gmail.com") && !process.env.SMTP_SERVICE;
 
+  // When using Gmail service, do NOT set host/port — they conflict.
+  // nodemailer's "gmail" service already knows the correct host/port/security.
   const config = isGmail
     ? {
         service: "gmail",
-        auth: { user: smtpUser, pass: smtpPass },
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
       }
     : {
         host: smtpHost,
         port: smtpPort,
         secure: smtpSecure,
-        auth: { user: smtpUser, pass: smtpPass },
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
       };
 
-  config.connectionTimeout = 30000;
+  // Common options for both
+  config.connectionTimeout = 30000; // 30s — Render free tier can be slow
   config.greetingTimeout = 30000;
   config.socketTimeout = 30000;
   config.tls = { rejectUnauthorized: false };
+
+  // Debug logging in production to diagnose email issues
+  config.logger = process.env.NODE_ENV !== "production" ? true : false;
+  config.debug = process.env.NODE_ENV !== "production";
+
+  console.log(
+    `📧 SMTP transporter: ${isGmail ? "Gmail service" : `${smtpHost}:${smtpPort}`} | user: ${smtpUser}`,
+  );
 
   return nodemailer.createTransport(config);
 };

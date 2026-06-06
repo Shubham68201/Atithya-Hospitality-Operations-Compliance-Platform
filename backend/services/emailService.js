@@ -1,4 +1,8 @@
-import { createTransporter, useResend, sendViaResend } from "../config/nodemailer.js";
+import {
+  createTransporter,
+  useResend,
+  sendViaResend,
+} from "../config/nodemailer.js";
 
 const SMTP_USER = process.env.SMTP_USER;
 const SMTP_PASS = process.env.SMTP_PASS;
@@ -40,7 +44,8 @@ const send = async (to, subject, html) => {
     try {
       // Resend requires a verified domain or use "onboarding@resend.dev" for testing.
       // We cannot fallback to fromEmail if it's a @gmail.com address, so we default to onboarding@resend.dev.
-      const resendFrom = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+      const resendFrom =
+        process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
       const from = `${fromName} <${resendFrom}>`;
       return await sendViaResend({ from, to, subject, html, text });
     } catch (err) {
@@ -52,21 +57,28 @@ const send = async (to, subject, html) => {
 
   // ── Strategy 2: SMTP fallback (local dev / non-Render hosts) ──
   if (!SMTP_USER || !SMTP_PASS) {
-    throw new Error("No email provider configured. Set RESEND_API_KEY or SMTP_USER/SMTP_PASS.");
+    throw new Error(
+      "No email provider configured. Set RESEND_API_KEY or SMTP_USER/SMTP_PASS.",
+    );
   }
   try {
     const transporter = createTransporter();
     const info = await transporter.sendMail({
-      from: `"${fromName}" <${fromEmail}>`,
+      from: `"${process.env.FROM_NAME || "Atithya Platform"}" <${COMPANY_EMAIL}>`,
       to,
       subject,
-      text,
+      text: html
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim(),
       html,
     });
-    console.log(`✉  Email sent via SMTP → ${to} | ${subject} | messageId: ${info.messageId}`);
+    console.log(
+      `✉  Email sent → ${to} | ${subject} | messageId: ${info.messageId}`,
+    );
     return info;
   } catch (err) {
-    console.error(`❌ SMTP FAILED → ${to} | ${subject}`);
+    console.error(`❌ Email FAILED → ${to} | ${subject}`);
     console.error(`   Error: ${err.message}`);
     console.error(`   Code: ${err.code} | Command: ${err.command}`);
     if (err.response) console.error(`   SMTP Response: ${err.response}`);
