@@ -79,18 +79,30 @@ app.get("/api/health", (req, res) =>
   }),
 );
 
-// ── SMTP diagnostic (verify connection only, no email sent) ──────────
+// ── Email diagnostic (verify connection only, no email sent) ─────────
 app.get("/api/health/email-test", async (req, res) => {
   try {
-    const { createTransporter } = await import("./config/nodemailer.js");
-    const transporter = createTransporter();
-    await transporter.verify();
-    res.json({ success: true, message: "SMTP connection verified successfully." });
+    const { createTransporter, useResend } = await import("./config/nodemailer.js");
+
+    if (useResend()) {
+      // Resend uses HTTP API — just verify the key is set
+      res.json({
+        success: true,
+        message: "Resend API key is configured. Email will be sent via Resend HTTP API.",
+        provider: "resend",
+        resend_from: process.env.RESEND_FROM_EMAIL || process.env.FROM_EMAIL || "not set",
+      });
+    } else {
+      // Test SMTP connection
+      const transporter = createTransporter();
+      await transporter.verify();
+      res.json({ success: true, message: "SMTP connection verified successfully.", provider: "smtp" });
+    }
   } catch (err) {
-    console.error("SMTP verify failed:", err);
+    console.error("Email verify failed:", err);
     res.status(500).json({
       success: false,
-      message: "SMTP connection failed.",
+      message: "Email connection failed.",
       error: err.message,
       code: err.code,
       command: err.command,
