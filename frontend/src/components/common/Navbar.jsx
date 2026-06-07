@@ -7,24 +7,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 const navLinks = [
-  { to: "/",          label: "Home" },
-  { to: "/about",     label: "About" },
+  { to: "/", label: "Home" },
+  { to: "/about", label: "About" },
   { to: "/solutions", label: "Solutions" },
-  { to: "/careers",   label: "Careers" },
-  { to: "/contact",   label: "Contact" },
+  { to: "/careers", label: "Careers" },
+  { to: "/contact", label: "Contact" },
 ];
 
 export default function Navbar() {
-  const [scrolled,  setScrolled]  = useState(false);
-  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { user } = useSelector((s) => s.auth);
-  const dispatch   = useDispatch();
-  const navigate   = useNavigate();
-  const location   = useLocation();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // On non-home pages, always show solid navy bg
-  const isHome     = location.pathname === "/";
-  const solidBg    = !isHome || scrolled;
+  const isHome = location.pathname === "/";
+  const solidBg = !isHome || scrolled;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -33,7 +33,9 @@ export default function Navbar() {
   }, []);
 
   // Close mobile menu on route change
-  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
@@ -44,18 +46,27 @@ export default function Navbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        solidBg ? "bg-navy shadow-lg shadow-navy/30 py-3" : "bg-transparent py-5"
+        solidBg
+          ? "bg-navy shadow-lg shadow-navy/30 py-3"
+          : "bg-transparent py-5"
       }`}
     >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gold/10 border border-gold/30 flex items-center justify-center flex-shrink-0">
-            <span className="font-cinzel text-gold font-bold text-lg">A</span>
-          </div>
+          <img
+            src="/logo.jpeg"
+            alt="Atithya Logo"
+            className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-gold/30"
+          />
+
           <div className="hidden sm:block">
-            <p className="font-cinzel text-ivory text-lg tracking-[3px] leading-none">ATITHYA</p>
-            <p className="text-[#9BB0C9] text-[9px] tracking-widest leading-none mt-0.5">BY SHRI PERUMAL</p>
+            <p className="font-cinzel text-ivory text-lg tracking-[3px] leading-none">
+              ATITHYA
+            </p>
+            <p className="text-[#9BB0C9] text-[9px] tracking-widest leading-none mt-0.5">
+              BY SHRI PERUMAL
+            </p>
           </div>
         </Link>
 
@@ -82,19 +93,42 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3">
           {user ? (
             <>
-              <Link to="/dashboard" className="btn-outline-gold text-sm px-4 py-2 rounded-lg">Dashboard</Link>
-              <button onClick={handleLogout} className="btn-gold text-sm px-4 py-2 rounded-lg">Logout</button>
+              <Link
+                to="/dashboard"
+                className="btn-outline-gold text-sm px-4 py-2 rounded-lg"
+              >
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="btn-gold text-sm px-4 py-2 rounded-lg"
+              >
+                Logout
+              </button>
             </>
           ) : (
             <>
-              <Link to="/login"    className="text-[#C8D8E8] hover:text-ivory text-sm font-medium transition-colors">Login</Link>
-              <Link to="/register" className="btn-gold text-sm px-5 py-2.5 rounded-lg">Get Started</Link>
+              <Link
+                to="/login"
+                className="text-[#C8D8E8] hover:text-ivory text-sm font-medium transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="btn-gold text-sm px-5 py-2.5 rounded-lg"
+              >
+                Get Started
+              </Link>
             </>
           )}
         </div>
 
         {/* Mobile hamburger */}
-        <button className="lg:hidden text-ivory p-2" onClick={() => setMenuOpen(!menuOpen)}>
+        <button
+          className="lg:hidden text-ivory p-2"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           {menuOpen ? <HiX size={24} /> : <HiMenu size={24} />}
         </button>
       </nav>
@@ -111,11 +145,15 @@ export default function Navbar() {
             <div className="px-4 py-4 flex flex-col gap-2">
               {navLinks.map(({ to, label }) => (
                 <NavLink
-                  key={to} to={to} end={to === "/"}
+                  key={to}
+                  to={to}
+                  end={to === "/"}
                   onClick={() => setMenuOpen(false)}
                   className={({ isActive }) =>
                     `px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive ? "bg-gold/20 text-gold" : "text-[#C8D8E8] hover:bg-white/5"
+                      isActive
+                        ? "bg-gold/20 text-gold"
+                        : "text-[#C8D8E8] hover:bg-white/5"
                     }`
                   }
                 >
@@ -125,13 +163,39 @@ export default function Navbar() {
               <div className="border-t border-white/10 pt-3 mt-2 flex flex-col gap-2">
                 {user ? (
                   <>
-                    <Link to="/dashboard" onClick={() => setMenuOpen(false)} className="btn-outline-gold text-center text-sm py-2.5">Dashboard</Link>
-                    <button onClick={() => { handleLogout(); setMenuOpen(false); }} className="btn-gold text-sm py-2.5">Logout</button>
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMenuOpen(false)}
+                      className="btn-outline-gold text-center text-sm py-2.5"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setMenuOpen(false);
+                      }}
+                      className="btn-gold text-sm py-2.5"
+                    >
+                      Logout
+                    </button>
                   </>
                 ) : (
                   <>
-                    <Link to="/login"    onClick={() => setMenuOpen(false)} className="btn-outline-gold text-center text-sm py-2.5">Login</Link>
-                    <Link to="/register" onClick={() => setMenuOpen(false)} className="btn-gold text-center text-sm py-2.5">Get Started</Link>
+                    <Link
+                      to="/login"
+                      onClick={() => setMenuOpen(false)}
+                      className="btn-outline-gold text-center text-sm py-2.5"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setMenuOpen(false)}
+                      className="btn-gold text-center text-sm py-2.5"
+                    >
+                      Get Started
+                    </Link>
                   </>
                 )}
               </div>
